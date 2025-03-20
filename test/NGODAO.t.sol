@@ -9,6 +9,5 @@ contract NGODAOTest is Test {
 
     function setUp() public {}
 
-    function testDonate() public {
-    }
+    function testDonate() public {}
 }
