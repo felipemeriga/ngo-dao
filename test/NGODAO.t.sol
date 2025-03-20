@@ -8,4 +8,7 @@ contract NGODAOTest is Test {
     NGODAO public counter;
 
     function setUp() public {}
+
+    function testDonate() public {
+    }
 }
