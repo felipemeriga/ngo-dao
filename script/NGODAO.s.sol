@@ -4,15 +4,15 @@ pragma solidity ^0.8.13;
 import {Script, console} from "forge-std/Script.sol";
 import {NGODAO} from "../src/NGODAO.sol";
 
-contract CounterScript is Script {
-    NGODAO public counter;
+contract NGODAOScript is Script {
+    NGODAO public dao;
 
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        counter = new NGODAO();
+        dao = new NGODAO();
 
         vm.stopBroadcast();
     }
