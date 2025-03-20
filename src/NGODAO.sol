@@ -10,13 +10,13 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // Define the structure for a proposal.
     struct Proposal {
         string description; // Description of the donation proposal.
-        address target;     // Target address to call.
-        uint256 value;      // Amount of ETH (in wei) to send.
-        bytes data;         // Call data (could be empty for a plain ETH transfer).
-        uint256 deadline;   // Voting deadline timestamp.
-        uint256 yesVotes;   // Count of yes votes.
-        uint256 noVotes;    // Count of no votes.
-        bool executed;      // Whether the proposal has been executed.
+        address target; // Target address to call.
+        uint256 value; // Amount of ETH (in wei) to send.
+        bytes data; // Call data (could be empty for a plain ETH transfer).
+        uint256 deadline; // Voting deadline timestamp.
+        uint256 yesVotes; // Count of yes votes.
+        uint256 noVotes; // Count of no votes.
+        bool executed; // Whether the proposal has been executed.
     }
 
     // Array to store proposals.
@@ -34,11 +34,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // Events for logging contract activities.
     event DonationReceived(address indexed donor, uint256 amount);
     event ProposalCreated(
-        uint256 indexed proposalId,
-        string description,
-        address target,
-        uint256 value,
-        uint256 deadline
+        uint256 indexed proposalId, string description, address target, uint256 value, uint256 deadline
     );
     event VoteCast(uint256 indexed proposalId, address indexed voter, bool support);
     event ProposalExecuted(uint256 indexed proposalId, bool success);
@@ -79,7 +75,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     /**
- * @notice Get all the proposals made in this DAO.
+     * @notice Get all the proposals made in this DAO.
      * @return the list with all the Proposal.
      */
     function getAllProposals() external view returns (Proposal[] memory) {
@@ -94,24 +90,24 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
      * @param _data The call data for the function call (use empty bytes for a plain ETH transfer).
      * @return proposalId The ID of the newly created proposal.
      */
-    function createProposal(
-        string memory _description,
-        address _target,
-        uint256 _value,
-        bytes memory _data
-    ) public returns (uint256 proposalId) {
+    function createProposal(string memory _description, address _target, uint256 _value, bytes memory _data)
+        public
+        returns (uint256 proposalId)
+    {
         require(address(this).balance >= _value, "DAO treasury doesn't have enough funds");
         uint256 deadline = block.timestamp + votingPeriod;
-        proposals.push(Proposal({
-            description: _description,
-            target: _target,
-            value: _value,
-            data: _data,
-            deadline: deadline,
-            yesVotes: 0,
-            noVotes: 0,
-            executed: false
-        }));
+        proposals.push(
+            Proposal({
+                description: _description,
+                target: _target,
+                value: _value,
+                data: _data,
+                deadline: deadline,
+                yesVotes: 0,
+                noVotes: 0,
+                executed: false
+            })
+        );
         proposalId = proposals.length - 1;
         emit ProposalCreated(proposalId, _description, _target, _value, deadline);
     }
@@ -147,7 +143,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         require(proposal.yesVotes > proposal.noVotes, "Proposal did not pass");
         require(address(this).balance >= proposal.value, "Insufficient funds in DAO treasury");
         proposal.executed = true;
-        (bool success, ) = proposal.target.call{value: proposal.value}(proposal.data);
+        (bool success,) = proposal.target.call{value: proposal.value}(proposal.data);
         require(success, "Proposal execution failed");
         emit ProposalExecuted(proposalId, success);
     }

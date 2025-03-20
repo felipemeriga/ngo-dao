@@ -7,7 +7,5 @@ import {NGODAO} from "../src/NGODAO.sol";
 contract NGODAOTest is Test {
     NGODAO public counter;
 
-    function setUp() public {
-
-    }
+    function setUp() public {}
 }
