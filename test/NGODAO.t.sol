@@ -111,6 +111,47 @@ contract NGODAOTest is Test {
         vm.stopPrank();
     }
 
+    function testVoteNonExistingProposal() public {
+        vm.startPrank(user);
+        vm.expectRevert("Proposal does not exist");
+        ngodao.vote(0, true);
+
+        vm.stopPrank();
+    }
+
+    function testVoteTwice() public {
+        vm.startPrank(user);
+
+        // User donates some ether to the NGO
+        ngodao.donate{value: 10 ether}();
+
+        // Creating the proposal
+        uint256 proposalID = ngodao.createProposal("Send money to a charity church", address(church), 5 ether, "");
+
+        ngodao.vote(proposalID, true);
+
+        // User tries to vote twice on the same proposal
+        vm.expectRevert("Already voted on this proposal");
+        ngodao.vote(proposalID, true);
+        vm.stopPrank();
+    }
+
+    function testExecuteUnexpiredProposal() public {
+        vm.startPrank(user);
+
+        // User donates some ether to the NGO
+        ngodao.donate{value: 10 ether}();
+
+        // Creating the proposal
+        uint256 proposalID = ngodao.createProposal("Send money to a charity church", address(church), 5 ether, "");
+
+        vm.expectRevert("Voting period not ended");
+        // User tries to execute the proposal before the expiration
+        ngodao.executeProposal(proposalID);
+
+        vm.stopPrank();
+    }
+
     function testInsufficientFundsToCreateProposal() public {
         vm.startPrank(user);
 
