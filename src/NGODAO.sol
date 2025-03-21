@@ -28,6 +28,9 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // Optional: Track donor contributions.
     mapping(address => uint256) public donations;
 
+    // Total donations accumulated in the DAO treasury.
+    uint256 public totalDonations;
+
     // Voting period duration (in seconds).
     uint256 public votingPeriod;
 
@@ -63,6 +66,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function donate() public payable {
         require(msg.value > 0, "Donation must be greater than 0");
         donations[msg.sender] += msg.value;
+        totalDonations += msg.value;
         emit DonationReceived(msg.sender, msg.value);
     }
 
@@ -71,6 +75,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
      */
     receive() external payable {
         donations[msg.sender] += msg.value;
+        totalDonations += msg.value;
         emit DonationReceived(msg.sender, msg.value);
     }
 
