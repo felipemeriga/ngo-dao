@@ -6,19 +6,19 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
-    // Define the structure for a proposal.
-    struct Proposal {
-        string description; // Description of the donation proposal.
-        address target; // Target address to call.
-        uint256 value; // Amount of ETH (in wei) to send.
-        bytes data; // Call data (could be empty for a plain ETH transfer).
-        uint256 deadline; // Voting deadline timestamp.
-        uint256 yesVotes; // Count of yes votes.
-        uint256 noVotes; // Count of no votes.
-        bool executed; // Whether the proposal has been executed.
-    }
+// Define the structure for a proposal.
+struct Proposal {
+    string description; // Description of the donation proposal.
+    address target; // Target address to call.
+    uint256 value; // Amount of ETH (in wei) to send.
+    bytes data; // Call data (could be empty for a plain ETH transfer).
+    uint256 deadline; // Voting deadline timestamp.
+    uint256 yesVotes; // Count of yes votes.
+    uint256 noVotes; // Count of no votes.
+    bool executed; // Whether the proposal has been executed.
+}
 
+contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // Array to store proposals.
     Proposal[] public proposals;
 
