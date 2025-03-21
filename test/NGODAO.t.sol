@@ -11,7 +11,9 @@ contract NGODAOTest is Test {
     NGODAO public ngodao;
     ERC1967Proxy public proxy;
     address public user = address(0x1000);
-    address public church = address(0x1001);
+    address public user2 = address(0x1001);
+    address public user3 = address(0x1010);
+    address public church = address(0x1011);
 
     function setUp() public {
         // Create a new implementation contract
@@ -25,6 +27,7 @@ contract NGODAOTest is Test {
 
         // Transfer 5 ethers to user wallet
         payable(address(user)).transfer(100 ether);
+        payable(address(user2)).transfer(100 ether);
     }
 
     function testDonate() public {
@@ -67,6 +70,84 @@ contract NGODAOTest is Test {
         assertEq(5, firstProposal.value);
         assertEq(address(church), firstProposal.target);
         assertEq("Send money to a charity church", firstProposal.description);
+
+        vm.stopPrank();
+    }
+
+    function testVoteProposal() public {
+        vm.startPrank(user);
+
+        // User donates some ether to the NGO
+        ngodao.donate{value: 10 ether}();
+
+        // Creating the proposal
+        uint256 proposalID = ngodao.createProposal("Send money to a charity church", address(church), 5 ether, "");
+        ngodao.vote(proposalID, true);
+        assertEq(true, ngodao.voted(proposalID, address(user)));
+        vm.stopPrank();
+
+        vm.startPrank(user2);
+
+        // Second user votes
+        ngodao.vote(proposalID, true);
+        assertEq(true, ngodao.voted(proposalID, address(user2)));
+
+        vm.stopPrank();
+
+        // Warp time forward to let the voting period to expire
+        uint256 warpTime = 10 * 86400;
+        vm.warp(block.timestamp + warpTime);
+
+        vm.startPrank(user3);
+        vm.expectRevert("Voting period has ended");
+        // Another user will try to vote after the expiration
+        ngodao.vote(proposalID, true);
+
+        // Execute the proposal
+        ngodao.executeProposal(proposalID);
+
+        // Make sure the ether has been sent to the proposal target
+        assertEq(church.balance, 5 ether);
+        vm.stopPrank();
+    }
+
+    function testInsufficientFundsToCreateProposal() public {
+        vm.startPrank(user);
+
+        // User donates some ether to the NGO
+        ngodao.donate{value: 10 ether}();
+
+        // Creating the proposal with more money than the treasury has
+        vm.expectRevert("DAO treasury doesn't have enough funds");
+        ngodao.createProposal("Send money to a charity church", address(church), 15 ether, "");
+
+        vm.stopPrank();
+    }
+
+    function testInsufficientFundsExecutingProposal() public {
+        vm.startPrank(user);
+
+        // User donates some ether to the NGO
+        ngodao.donate{value: 10 ether}();
+
+        // Creating two proposals, for executing one of them, while when executing the another, the treasury will have insufficient funds
+        uint256 firstProposalID = ngodao.createProposal("Send money to a charity church", address(church), 10 ether, "");
+        uint256 secondProposalID =
+            ngodao.createProposal("Send money to a second charity church", address(church), 5 ether, "");
+        // Add a vote for approving the proposalI
+        ngodao.vote(firstProposalID, true);
+        ngodao.vote(secondProposalID, true);
+
+        // Warp time forward to let the voting period to expire
+        uint256 warpTime = 3 * 86400;
+        vm.warp(block.timestamp + warpTime);
+
+        // Executing the first proposal
+        ngodao.executeProposal(firstProposalID);
+
+        // Executing the second proposal will fail, due to insufficient funds in the NGO treasury
+        vm.expectRevert("Insufficient funds in DAO treasury");
+        ngodao.executeProposal(secondProposalID);
 
         vm.stopPrank();
     }
