@@ -6,19 +6,19 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
-    // Define the structure for a proposal.
-    struct Proposal {
-        string description; // Description of the donation proposal.
-        address target; // Target address to call.
-        uint256 value; // Amount of ETH (in wei) to send.
-        bytes data; // Call data (could be empty for a plain ETH transfer).
-        uint256 deadline; // Voting deadline timestamp.
-        uint256 yesVotes; // Count of yes votes.
-        uint256 noVotes; // Count of no votes.
-        bool executed; // Whether the proposal has been executed.
-    }
+// Define the structure for a proposal.
+struct Proposal {
+    string description; // Description of the donation proposal.
+    address target; // Target address to call.
+    uint256 value; // Amount of ETH (in wei) to send.
+    bytes data; // Call data (could be empty for a plain ETH transfer).
+    uint256 deadline; // Voting deadline timestamp.
+    uint256 yesVotes; // Count of yes votes.
+    uint256 noVotes; // Count of no votes.
+    bool executed; // Whether the proposal has been executed.
+}
 
+contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // Array to store proposals.
     Proposal[] public proposals;
 
@@ -27,6 +27,9 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     // Optional: Track donor contributions.
     mapping(address => uint256) public donations;
+
+    // Total donations accumulated in the DAO treasury.
+    uint256 public totalDonations;
 
     // Voting period duration (in seconds).
     uint256 public votingPeriod;
@@ -63,6 +66,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function donate() public payable {
         require(msg.value > 0, "Donation must be greater than 0");
         donations[msg.sender] += msg.value;
+        totalDonations += msg.value;
         emit DonationReceived(msg.sender, msg.value);
     }
 
@@ -71,6 +75,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
      */
     receive() external payable {
         donations[msg.sender] += msg.value;
+        totalDonations += msg.value;
         emit DonationReceived(msg.sender, msg.value);
     }
 
