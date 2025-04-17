@@ -8,6 +8,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 // Define the structure for a proposal.
 struct Proposal {
+    string title;
     string description; // Description of the donation proposal.
     address target; // Target address to call.
     uint256 value; // Amount of ETH (in wei) to send.
@@ -37,7 +38,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // Events for logging contract activities.
     event DonationReceived(address indexed donor, uint256 amount);
     event ProposalCreated(
-        uint256 indexed proposalId, string description, address target, uint256 value, uint256 deadline
+        uint256 indexed proposalId, string title, string description, address target, uint256 value, uint256 deadline
     );
     event VoteCast(uint256 indexed proposalId, address indexed voter, bool support);
     event ProposalExecuted(uint256 indexed proposalId, bool success);
@@ -95,7 +96,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
      * @param _data The call data for the function call (use empty bytes for a plain ETH transfer).
      * @return proposalId The ID of the newly created proposal.
      */
-    function createProposal(string memory _description, address _target, uint256 _value, bytes memory _data)
+    function createProposal(string memory _title, string memory _description, address _target, uint256 _value, bytes memory _data)
         public
         returns (uint256 proposalId)
     {
@@ -103,6 +104,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         uint256 deadline = block.timestamp + votingPeriod;
         proposals.push(
             Proposal({
+                title: _title,
                 description: _description,
                 target: _target,
                 value: _value,
@@ -114,7 +116,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             })
         );
         proposalId = proposals.length - 1;
-        emit ProposalCreated(proposalId, _description, _target, _value, deadline);
+        emit ProposalCreated(proposalId, _title, _description, _target, _value, deadline);
     }
 
     /**

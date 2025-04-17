@@ -15,10 +15,11 @@ contract NGODAOScript is Script {
         dao = new NGODAO();
         console.log("new NGO DAO Implementation Address:", address(dao));
 
-
         // Upgrade the proxy
         NGODAO(payable(PROXY_ADDRESS)).upgradeToAndCall(address(dao), "");
 
+
+        console.log("Upgrade successful!");
         vm.stopBroadcast();
     }
 }
