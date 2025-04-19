@@ -183,10 +183,8 @@ contract NGODAOTest is Test {
     function testClearProposalsOwner() public {
         // User donates some ether to the NGO
         ngodao.donate{value: 20 ether}();
-        uint256 firstProposalID =
-            ngodao.createProposal("donation", "Send money to a charity church", address(church), 10 ether, "");
-        uint256 secondProposalID =
-            ngodao.createProposal("donation", "Send money to a second charity church", address(church), 5 ether, "");
+        ngodao.createProposal("donation", "Send money to a charity church", address(church), 10 ether, "");
+        ngodao.createProposal("donation", "Send money to a second charity church", address(church), 5 ether, "");
 
         ngodao.clearProposals();
 
