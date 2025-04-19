@@ -18,7 +18,6 @@ contract NGODAOScript is Script {
         // Upgrade the proxy
         NGODAO(payable(PROXY_ADDRESS)).upgradeToAndCall(address(dao), "");
 
-
         console.log("Upgrade successful!");
         vm.stopBroadcast();
     }

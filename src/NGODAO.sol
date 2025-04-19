@@ -7,17 +7,17 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 // Define the structure for a proposal.
-    struct Proposal {
-        string title;
-        string description; // Description of the donation proposal.
-        address target; // Target address to call.
-        uint256 value; // Amount of ETH (in wei) to send.
-        bytes data; // Call data (could be empty for a plain ETH transfer).
-        uint256 deadline; // Voting deadline timestamp.
-        uint256 yesVotes; // Count of yes votes.
-        uint256 noVotes; // Count of no votes.
-        bool executed; // Whether the proposal has been executed.
-    }
+struct Proposal {
+    string title;
+    string description; // Description of the donation proposal.
+    address target; // Target address to call.
+    uint256 value; // Amount of ETH (in wei) to send.
+    bytes data; // Call data (could be empty for a plain ETH transfer).
+    uint256 deadline; // Voting deadline timestamp.
+    uint256 yesVotes; // Count of yes votes.
+    uint256 noVotes; // Count of no votes.
+    bool executed; // Whether the proposal has been executed.
+}
 
 contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // Array to store proposals.
@@ -103,10 +103,13 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
      * @param _data The call data for the function call (use empty bytes for a plain ETH transfer).
      * @return proposalId The ID of the newly created proposal.
      */
-    function createProposal(string memory _title, string memory _description, address _target, uint256 _value, bytes memory _data)
-    public
-    returns (uint256 proposalId)
-    {
+    function createProposal(
+        string memory _title,
+        string memory _description,
+        address _target,
+        uint256 _value,
+        bytes memory _data
+    ) public returns (uint256 proposalId) {
         require(address(this).balance >= _value, "DAO treasury doesn't have enough funds");
         uint256 deadline = block.timestamp + votingPeriod;
         proposals.push(

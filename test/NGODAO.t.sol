@@ -93,7 +93,8 @@ contract NGODAOTest is Test {
         ngodao.donate{value: 10 ether}();
 
         // Creating the proposal
-        uint256 proposalID = ngodao.createProposal("donation", "Send money to a charity church", address(church), 5 ether, "");
+        uint256 proposalID =
+            ngodao.createProposal("donation", "Send money to a charity church", address(church), 5 ether, "");
         ngodao.vote(proposalID, true);
         assertEq(true, ngodao.voted(proposalID, address(user)));
         vm.stopPrank();
@@ -138,7 +139,8 @@ contract NGODAOTest is Test {
         ngodao.donate{value: 10 ether}();
 
         // Creating the proposal
-        uint256 proposalID = ngodao.createProposal("donation", "Send money to a charity church", address(church), 5 ether, "");
+        uint256 proposalID =
+            ngodao.createProposal("donation", "Send money to a charity church", address(church), 5 ether, "");
 
         ngodao.vote(proposalID, true);
 
@@ -155,7 +157,8 @@ contract NGODAOTest is Test {
         ngodao.donate{value: 10 ether}();
 
         // Creating the proposal
-        uint256 proposalID = ngodao.createProposal("donation", "Send money to a charity church", address(church), 5 ether, "");
+        uint256 proposalID =
+            ngodao.createProposal("donation", "Send money to a charity church", address(church), 5 ether, "");
 
         vm.expectRevert("Voting period not ended");
         // User tries to execute the proposal before the expiration
@@ -180,9 +183,10 @@ contract NGODAOTest is Test {
     function testClearProposalsOwner() public {
         // User donates some ether to the NGO
         ngodao.donate{value: 20 ether}();
-        uint256 firstProposalID = ngodao.createProposal("donation", "Send money to a charity church", address(church), 10 ether, "");
+        uint256 firstProposalID =
+            ngodao.createProposal("donation", "Send money to a charity church", address(church), 10 ether, "");
         uint256 secondProposalID =
-                            ngodao.createProposal("donation", "Send money to a second charity church", address(church), 5 ether, "");
+            ngodao.createProposal("donation", "Send money to a second charity church", address(church), 5 ether, "");
 
         ngodao.clearProposals();
 
@@ -198,7 +202,8 @@ contract NGODAOTest is Test {
         ngodao.donate{value: 10 ether}();
 
         // Creating two proposals, for executing one of them, while when executing the another, the treasury will have insufficient funds
-        uint256 firstProposalID = ngodao.createProposal("donation", "Send money to a charity church", address(church), 10 ether, "");
+        uint256 firstProposalID =
+            ngodao.createProposal("donation", "Send money to a charity church", address(church), 10 ether, "");
         uint256 secondProposalID =
             ngodao.createProposal("donation", "Send money to a second charity church", address(church), 5 ether, "");
         // Add a vote for approving the proposalI
@@ -226,7 +231,8 @@ contract NGODAOTest is Test {
         ngodao.donate{value: 10 ether}();
 
         // Creating the proposal
-        uint256 proposalID = ngodao.createProposal("donation", "Send money to a charity church", address(church), 5 ether, "");
+        uint256 proposalID =
+            ngodao.createProposal("donation", "Send money to a charity church", address(church), 5 ether, "");
         ngodao.vote(proposalID, true);
         vm.stopPrank();
 
@@ -253,7 +259,8 @@ contract NGODAOTest is Test {
         ngodao.donate{value: 10 ether}();
 
         // Creating the proposal
-        uint256 proposalID = ngodao.createProposal( "donation", "Send money to a charity church", address(church), 5 ether, "");
+        uint256 proposalID =
+            ngodao.createProposal("donation", "Send money to a charity church", address(church), 5 ether, "");
         ngodao.vote(proposalID, true);
 
         // Warp time forward to let the voting period to expire
@@ -276,8 +283,9 @@ contract NGODAOTest is Test {
         ngodao.donate{value: 10 ether}();
 
         // Creating the proposal with wrong data
-        uint256 proposalID =
-            ngodao.createProposal("donation", "Send money to a charity church", address(church), 5 ether, "nasdunasudnaudnasudad");
+        uint256 proposalID = ngodao.createProposal(
+            "donation", "Send money to a charity church", address(church), 5 ether, "nasdunasudnaudnasudad"
+        );
         ngodao.vote(proposalID, true);
 
         // Warp time forward to let the voting period to expire
