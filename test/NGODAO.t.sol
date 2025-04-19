@@ -10,6 +10,7 @@ import {Test, console} from "forge-std/Test.sol";
 contract NGODAOTest is Test {
     NGODAO public ngodao;
     ERC1967Proxy public proxy;
+    address owner;
     address public user = address(0x1000);
     address public user2 = address(0x1001);
     address public user3 = address(0x1010);
@@ -25,9 +26,12 @@ contract NGODAOTest is Test {
         // casting the proxy contract to NGODAO interface, because we are going to interact with the proxy
         ngodao = NGODAO(payable(address(proxy)));
 
+        //Create onwer of the contract
+        owner = address(this);
+
         // Transfer 5 ethers to user wallet
-        payable(address(user)).transfer(100 ether);
-        payable(address(user2)).transfer(100 ether);
+        payable(address(user)).transfer(200 ether);
+        payable(address(user2)).transfer(200 ether);
     }
 
     function testDonate() public {
@@ -171,6 +175,20 @@ contract NGODAOTest is Test {
         ngodao.createProposal("donation", "Send money to a charity church", address(church), 15 ether, "");
 
         vm.stopPrank();
+    }
+
+    function testClearProposalsOwner() public {
+        // User donates some ether to the NGO
+        ngodao.donate{value: 20 ether}();
+        uint256 firstProposalID = ngodao.createProposal("donation", "Send money to a charity church", address(church), 10 ether, "");
+        uint256 secondProposalID =
+                            ngodao.createProposal("donation", "Send money to a second charity church", address(church), 5 ether, "");
+
+        ngodao.clearProposals();
+
+        Proposal[] memory proposals = ngodao.getAllProposals();
+
+        assertEq(0, proposals.length);
     }
 
     function testInsufficientFundsExecutingProposal() public {
