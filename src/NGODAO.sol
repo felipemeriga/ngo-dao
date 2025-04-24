@@ -8,6 +8,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 // Define the structure for a proposal.
 struct Proposal {
+    uint256 id; // Unique identifier for the proposal
     string title;
     string description; // Description of the donation proposal.
     address target; // Target address to call.
@@ -112,8 +113,10 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     ) public returns (uint256 proposalId) {
         require(address(this).balance >= _value, "DAO treasury doesn't have enough funds");
         uint256 deadline = block.timestamp + votingPeriod;
+        proposalId = proposals.length;
         proposals.push(
             Proposal({
+                id: proposalId,
                 title: _title,
                 description: _description,
                 target: _target,
@@ -125,7 +128,6 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
                 executed: false
             })
         );
-        proposalId = proposals.length - 1;
         emit ProposalCreated(proposalId, _title, _description, _target, _value, deadline);
     }
 
