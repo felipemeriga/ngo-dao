@@ -10,7 +10,7 @@ contract NGODAOScript is Script {
     function run() public {
         vm.startBroadcast();
 
-        address PROXY_ADDRESS = 0xe65920D17678aaC3C51bEbf713F2B0e2bFaa34Fa;
+        address PROXY_ADDRESS = 0xe53f2315Ae1fbFd91250de7199b21AF4F0b968A2;
 
         dao = new NGODAO();
         console.log("new NGO DAO Implementation Address:", address(dao));
