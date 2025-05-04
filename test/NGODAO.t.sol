@@ -99,8 +99,6 @@ contract NGODAOTest is Test {
         assertEq(true, ngodao.voted(proposalID, address(user)));
         vm.stopPrank();
 
-
-
         vm.startPrank(user2);
 
         // Second user votes

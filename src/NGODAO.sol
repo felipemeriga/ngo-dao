@@ -5,18 +5,18 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-    struct Proposal {
-        bytes16 id; // UUID as bytes16
-        string title;
-        string description;
-        address target;
-        uint256 value;
-        bytes data;
-        uint256 deadline;
-        uint256 yesVotes;
-        uint256 noVotes;
-        bool executed;
-    }
+struct Proposal {
+    bytes16 id; // UUID as bytes16
+    string title;
+    string description;
+    address target;
+    uint256 value;
+    bytes data;
+    uint256 deadline;
+    uint256 yesVotes;
+    uint256 noVotes;
+    bool executed;
+}
 
 contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // Mapping from UUID to Proposal
@@ -38,12 +38,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // Events
     event DonationReceived(address indexed donor, uint256 amount);
     event ProposalCreated(
-        bytes16 indexed proposalId,
-        string title,
-        string description,
-        address target,
-        uint256 value,
-        uint256 deadline
+        bytes16 indexed proposalId, string title, string description, address target, uint256 value, uint256 deadline
     );
     event VoteCast(bytes16 indexed proposalId, address indexed voter, bool support);
     event ProposalExecuted(bytes16 indexed proposalId, bool success);
@@ -62,15 +57,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
      * @notice Generate a UUID using current parameters
      */
     function _generateUUID() private returns (bytes16) {
-        bytes32 hash = keccak256(
-            abi.encodePacked(
-                block.timestamp,
-                msg.sender,
-                nonce++,
-                block.prevrandao,
-                block.number
-            )
-        );
+        bytes32 hash = keccak256(abi.encodePacked(block.timestamp, msg.sender, nonce++, block.prevrandao, block.number));
         return bytes16(hash);
     }
 
@@ -139,6 +126,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         require(address(this).balance >= proposal.value, "Insufficient funds in DAO treasury");
 
         proposal.executed = true;
+        totalDonations -= proposal.value; // Subtract the value from totalDonations
         (bool success,) = proposal.target.call{value: proposal.value}(proposal.data);
         require(success, "Proposal execution failed");
 
@@ -150,7 +138,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
      */
     function getAllProposals() external view returns (Proposal[] memory) {
         Proposal[] memory allProposals = new Proposal[](proposalIds.length);
-        for (uint i = 0; i < proposalIds.length; i++) {
+        for (uint256 i = 0; i < proposalIds.length; i++) {
             allProposals[i] = proposals[proposalIds[i]];
         }
         return allProposals;
@@ -160,7 +148,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
      * @notice Clear all proposals (only owner)
      */
     function clearProposals() external onlyOwner {
-        for(uint i = 0; i < proposalIds.length; i++) {
+        for (uint256 i = 0; i < proposalIds.length; i++) {
             delete proposals[proposalIds[i]];
         }
         delete proposalIds;
@@ -170,6 +158,7 @@ contract NGODAO is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function withdrawAll() external onlyOwner {
         uint256 balance = address(this).balance;
         require(balance > 0, "No funds to withdraw");
+        totalDonations = 0; // Reset totalDonations to zero
         (bool success,) = payable(owner()).call{value: balance}("");
         require(success, "Withdrawal failed");
     }
